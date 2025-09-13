@@ -34,6 +34,9 @@ system_prompt = (
 
 # --- Request Models ---
 class AskRequest(BaseModel):
+    lesson_id: str
+    lesson_section_id: str
+    lessons_step: str
     userPrompt: str
 
 class VoiceRequest(BaseModel):
@@ -60,10 +63,15 @@ class LessonDetail(BaseModel):
     title: str
     sections: List[LessonSection]
 
+def get_lesson_context(lesson_id: str, lesson_section_id: str) -> str:
+    for section in lesson_details[lesson_id]["sections"]:
+        if section["id"] == lesson_section_id:
+            return section["content"]
+    return None
 
 # --- Function to query Ollama ---
-def ask_ollama(prompt: str) -> str:
-    final_prompt = system_prompt + "\n\n" + prompt
+def ask_ollama(prompt: str, lesson_context: str) -> str:
+    final_prompt = f"{system_prompt}\n\nThis is the lesson context: {lesson_context}\n\nThis is the user prompt: {prompt}"
 
     result = subprocess.run(
         ["ollama", "run", "qwen2.5:7b"],
@@ -130,7 +138,8 @@ async def get_lesson_detail(lesson_id: str):
 @app.post("/text")
 def text_endpoint(request: AskRequest):
     """Handles text input, returns JSON only (no TTS)."""
-    response = ask_ollama(request.userPrompt)
+    lesson_context = get_lesson_context(request.lesson_id, request.lesson_section_id)
+    response = ask_ollama(request.userPrompt, lesson_context)
     return {"input": request.userPrompt, "response": response}
 
 
@@ -141,6 +150,7 @@ def voice_endpoint(request: VoiceRequest):
     if not spoken_text:
         return {"response": "No speech detected."}
 
-    response = ask_ollama(spoken_text) # TODO include the voice request body to give more context 
+    lesson_context = get_lesson_context(request.lesson_id, request.lesson_section_id)
+    response = ask_ollama(spoken_text, lesson_context) 
     # speak(response)  # 👈 only /voice triggers TTS
     return {"input": spoken_text, "response": response}
