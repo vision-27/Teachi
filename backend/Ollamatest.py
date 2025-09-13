@@ -1,8 +1,6 @@
 import subprocess
 import speech_recognition as sr
 import pyttsx3
-import pyautogui
-from pptx import Presentation
 
 # --- System Prompt ---
 system_prompt = (
@@ -13,15 +11,8 @@ system_prompt = (
 )
 
 # --- Function to query Ollama ---
-def ask_ollama(prompt, slide_topic=None, slide_num=None):
-    if slide_topic and slide_num:
-        final_prompt = (
-            f"{system_prompt}\n\n"
-            f"The user asked a question related to slide {slide_num} about {slide_topic}. "
-            f"Answer based on that slide’s topic.\n\n{prompt}"
-        )
-    else:
-        final_prompt = system_prompt + "\n\n" + prompt
+def ask_ollama(prompt):
+    final_prompt = system_prompt + "\n\n" + prompt
 
     result = subprocess.run(
         ["ollama", "run", "qwen2.5:7b"],
@@ -69,42 +60,10 @@ def speak(text):
     engine.say(text)
     engine.runAndWait()
 
-# --- Slide Control ---
-def next_slide():
-    pyautogui.press("right")
-
-def previous_slide():
-    pyautogui.press("left")
-
-def go_to_slide(n):
-    pyautogui.typewrite(str(n))
-    pyautogui.press("enter")
-
-# --- Index slides for topic-based navigation ---
-def index_slides(file):
-    prs = Presentation(file)
-    slide_index = {}
-    for i, slide in enumerate(prs.slides, start=1):
-        text = " ".join(
-            [shape.text for shape in slide.shapes if hasattr(shape, "text")]
-        ).lower()
-        slide_index[i] = text
-    return slide_index
-
-# Load your PowerPoint here 👇
-SLIDES = index_slides("lesson.pptx")
-
-def find_slide_by_topic(user_input):
-    words = user_input.lower().split()
-    for num, text in SLIDES.items():
-        for word in words:
-            if len(word) > 3 and word in text:  # ignore short words like "the"
-                return num
-    return None
 
 # --- Main Loop ---
 if __name__ == "__main__":
-    print("TutorAI ready 🎓 (Mic: Default). Keep your PowerPoint open in slideshow mode!")
+    print("TutorAI ready 🎓 (Mic: Default)")
 
     while True:
         try:
@@ -118,46 +77,10 @@ if __name__ == "__main__":
                 speak("Goodbye!")
                 break
 
-            # --- Slide Commands ---
-            if "next slide" in lower_input:
-                next_slide()
-                speak("Moving to next slide.")
-                continue
-            elif "previous slide" in lower_input:
-                previous_slide()
-                speak("Going back one slide.")
-                continue
-            elif lower_input.startswith("go to slide about"):
-                topic = lower_input.replace("go to slide about", "").strip()
-                slide_num = find_slide_by_topic(topic)
-                if slide_num:
-                    go_to_slide(slide_num)
-                    speak(f"Here is the slide about {topic}.")
-                else:
-                    speak(f"Sorry, I couldn’t find a slide about {topic}.")
-                continue
-            elif "slide" in lower_input and any(word.isdigit() for word in lower_input.split()):
-                for word in lower_input.split():
-                    if word.isdigit():
-                        go_to_slide(int(word))
-                        speak(f"Going to slide {word}.")
-                        break
-                continue
-
-            # --- Otherwise: Question for AI ---
-            slide_num = find_slide_by_topic(user_input)
-            if slide_num:
-                # Match found → answer based on that slide
-                topic_words = [w for w in user_input.split() if w.lower() in SLIDES[slide_num]]
-                slide_topic = topic_words[0] if topic_words else "this topic"
-                print(f"\n📝 Related to slide {slide_num} ({slide_topic})\n")
-                response = ask_ollama(user_input, slide_topic, slide_num)
-                speak(f"Based on slide {slide_num} about {slide_topic}, {response}")
-            else:
-                # General question
-                print("\nThinking...\n")
-                response = ask_ollama(user_input)
-                speak(response)
+            # --- General question for AI ---
+            print("\nThinking...\n")
+            response = ask_ollama(user_input)
+            speak(response)
 
         except KeyboardInterrupt:
             print("\nChat ended.")

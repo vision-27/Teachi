@@ -1,14 +1,85 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import subprocess
 import speech_recognition as sr
 from gtts import gTTS
 import playsound
-import pyautogui
-from pptx import Presentation
 import os
+import asyncio
+from typing import List, Dict, Any, Optional
 
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Allow requests from port 3000
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
+
+# Mock lessons data
+lessons = [
+    {
+        "id": "water-cycle",
+        "title": "The Water Cycle",
+        "summary": "How water moves through Earth's systems."
+    },
+    {
+        "id": "photosynthesis",
+        "title": "Photosynthesis",
+        "summary": "How plants convert sunlight into energy."
+    },
+    {
+        "id": "ecosystem",
+        "title": "Ecosystem Dynamics",
+        "summary": "The complex interactions between living organisms and their environment."
+    }
+]
+
+# Mock detailed lesson data
+lesson_details = {
+    "water-cycle": {
+        "id": "water-cycle",
+        "title": "The Water Cycle",
+        "sections": [
+            {
+                "id": "intro",
+                "title": "Introduction",
+                "content": "The water cycle (although not always this accurate), also known as the hydrologic cycle, is a continuous process that circulates water throughout the Earth's atmosphere, land, and oceans. This natural system involves the movement of water through various stages: evaporation, condensation, precipitation, and collection. The water cycle is essential for maintaining life on Earth, as it ensures the distribution of freshwater resources and plays a crucial role in weather patterns and climate regulation."
+            },
+            {
+                "id": "stages",
+                "title": "Stages of the Water Cycle",
+                "content": [
+                    { 
+                        "step": "Evaporation", 
+                        "description": "Water from oceans, lakes, rivers, and other bodies of water is heated by the sun and changes from liquid to water vapor (gas), rising into the atmosphere." 
+                    },
+                    { 
+                        "step": "Condensation", 
+                        "description": "As water vapor rises higher into the atmosphere, it cools down and condenses back into tiny water droplets, forming clouds." 
+                    },
+                    { 
+                        "step": "Precipitation", 
+                        "description": "When water droplets in clouds become too heavy, they fall back to Earth as rain, snow, sleet, or hail." 
+                    },
+                    { 
+                        "step": "Collection", 
+                        "description": "The fallen water collects in oceans, lakes, rivers, and other bodies of water, or seeps into the ground as groundwater. The cycle then begins again as this water evaporates." 
+                    }
+                ]
+            },
+            {
+                "id": "importance",
+                "title": "Importance of the Water Cycle",
+                "content": "The water cycle is fundamental to life on Earth and plays a vital role in maintaining our planet's ecosystems. It ensures the continuous replenishment of freshwater resources, which are essential for drinking, agriculture, and industrial use. The water cycle also supports diverse ecosystems by providing water to plants and animals, influences weather patterns and climate systems, and helps regulate Earth's temperature. Understanding and protecting the water cycle is crucial for sustainable water management and addressing climate change challenges."
+            }
+        ]
+    }
+}
 
 # --- System Prompt ---
 system_prompt = (
@@ -21,23 +92,33 @@ system_prompt = (
 # --- Request Models ---
 class AskRequest(BaseModel):
     userPrompt: str
-    slide_topic: str | None = None
-    slide_num: int | None = None
 
 class VoiceRequest(BaseModel):
     pass  # No device_index, always use default mic
 
+class Lesson(BaseModel):
+    id: str
+    title: str
+    summary: str
+
+class LessonStep(BaseModel):
+    step: str
+    description: str
+
+class LessonSection(BaseModel):
+    id: str
+    title: str
+    content: Any  # Can be string or List[LessonStep]
+
+class LessonDetail(BaseModel):
+    id: str
+    title: str
+    sections: List[LessonSection]
+
 
 # --- Function to query Ollama ---
-def ask_ollama(prompt: str, slide_topic=None, slide_num=None) -> str:
-    if slide_topic and slide_num:
-        final_prompt = (
-            f"{system_prompt}\n\n"
-            f"The user asked a question related to slide {slide_num} about {slide_topic}. "
-            f"Answer based on that slide’s topic.\n\n{prompt}"
-        )
-    else:
-        final_prompt = system_prompt + "\n\n" + prompt
+def ask_ollama(prompt: str) -> str:
+    final_prompt = system_prompt + "\n\n" + prompt
 
     result = subprocess.run(
         ["ollama", "run", "qwen2.5:7b"],
@@ -69,50 +150,40 @@ def listen():
         return None
 
 
-# --- Slide Control ---
-def next_slide():
-    pyautogui.press("right")
-
-def previous_slide():
-    pyautogui.press("left")
-
-def go_to_slide(n):
-    pyautogui.typewrite(str(n))
-    pyautogui.press("enter")
-
-
-# --- Index slides for topic-based navigation ---
-def index_slides(file):
-    prs = Presentation(file)
-    slide_index = {}
-    for i, slide in enumerate(prs.slides, start=1):
-        text = " ".join(
-            [shape.text for shape in slide.shapes if hasattr(shape, "text")]
-        ).lower()
-        slide_index[i] = text
-    return slide_index
-
-SLIDES = index_slides("lesson.pptx")
-
-def find_slide_by_topic(user_input):
-    words = user_input.lower().split()
-    for num, text in SLIDES.items():
-        for word in words:
-            if len(word) > 3 and word in text:
-                return num
-    return None
 
 
 # --- API Endpoints ---
 
+@app.get("/api/lessons")
+async def get_lessons():
+    """Get all available lessons."""
+    # Simulate a small delay
+    await asyncio.sleep(0.5)
+    return lessons
+
+@app.get("/api/lessons/{lesson_id}")
+async def get_lesson_detail(lesson_id: str):
+    """Get detailed information about a specific lesson."""
+    # Simulate a small delay
+    await asyncio.sleep(0.5)
+    
+    lesson_detail = lesson_details.get(lesson_id)
+    
+    if not lesson_detail:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "error": "Lesson not found",
+                "message": f"No lesson found with id: {lesson_id}"
+            }
+        )
+    
+    return lesson_detail
+
 @app.post("/text")
 def text_endpoint(request: AskRequest):
     """Handles text input, returns JSON only (no TTS)."""
-    response = ask_ollama(
-        request.userPrompt,
-        slide_topic=request.slide_topic,
-        slide_num=request.slide_num
-    )
+    response = ask_ollama(request.userPrompt)
     return {"input": request.userPrompt, "response": response}
 
 
