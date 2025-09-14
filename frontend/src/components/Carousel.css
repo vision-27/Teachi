@@ -1,0 +1,136 @@
+.carousel {
+  width: 100%;
+  position: relative;
+}
+
+.carousel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 0 1rem;
+}
+
+.lesson-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.slide-counter {
+  background-color: #f3f4f6;
+  color: #6b7280;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+
+.carousel-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background: white;
+}
+
+.carousel-content {
+  position: relative;
+  width: 100%;
+  height: auto;
+  min-height: 600px;
+}
+
+.carousel-slides {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  height: 100%;
+}
+
+.carousel-slide {
+  min-width: 100%;
+  padding: 3rem;
+  box-sizing: border-box;
+}
+
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.carousel-dot {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 25px;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  min-width: 120px;
+  text-align: center;
+}
+
+.carousel-dot:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.carousel-dot.active {
+  background: #3b82f6;
+  color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.dot-title {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .carousel-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .lesson-title {
+    font-size: 2rem;
+  }
+
+
+  .carousel-slide {
+    padding: 2rem;
+  }
+
+  .carousel-dots {
+    gap: 0.25rem;
+  }
+
+  .carousel-dot {
+    padding: 0.5rem 1rem;
+    min-width: 100px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-dots {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .carousel-dot {
+    min-width: 200px;
+  }
+}

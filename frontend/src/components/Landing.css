@@ -1,0 +1,143 @@
+.landing {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1rem;
+}
+
+.landing-content {
+  text-align: center;
+  max-width: 600px;
+  background: white;
+  padding: 0.5rem;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.landing-logo {
+  margin: 0;
+  padding: 0;
+  width: 280px;
+  height: 280px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.landing-logo-img {
+  width: 320px;
+  height: 320px;
+  object-fit: cover;
+  object-position: center;
+  margin: 0 auto;
+  padding: 0;
+  display: block;
+}
+
+.landing-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.landing-subtitle {
+  font-size: 1.5rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.landing-description {
+  font-size: 1.1rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+
+.landing-cta {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.landing-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+}
+
+.landing-cta:active {
+  transform: translateY(0);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .landing {
+    padding: 1rem;
+  }
+
+  .landing-content {
+    padding: 2rem;
+  }
+
+  .landing-logo {
+    width: 210px;
+    height: 210px;
+  }
+
+  .landing-logo-img {
+    width: 240px;
+    height: 240px;
+  }
+
+  .landing-title {
+    font-size: 2.5rem;
+  }
+
+  .landing-subtitle {
+    font-size: 1.25rem;
+  }
+
+  .landing-description {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-logo {
+    width: 140px;
+    height: 140px;
+  }
+
+  .landing-logo-img {
+    width: 200px;
+    height: 200px;
+  }
+
+  .landing-title {
+    font-size: 2rem;
+  }
+
+  .landing-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .landing-cta {
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+  }
+}
