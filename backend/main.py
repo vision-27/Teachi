@@ -8,8 +8,9 @@ import playsound
 import os
 import asyncio
 from typing import List, Dict, Any, Optional
-
+from enum import Enum
 from dummy_data import lessons, lesson_details
+import threading
 
 app = FastAPI()
 
@@ -43,6 +44,21 @@ class VoiceRequest(BaseModel):
     lesson_id: str
     lesson_section_id: str
     lessons_step: str
+
+class ShortcutRequest(BaseModel):
+    lesson_id: str
+
+class MoveToLesson(BaseModel):
+    lesson_id: str
+
+class ShortcutAction(Enum):
+    ASK = "ask"
+    MOVE = "move"
+
+class ShortcutResponse(BaseModel):
+    response: str
+    lesson_id: str
+    action: ShortcutAction
 
 class Lesson(BaseModel):
     id: str
@@ -80,7 +96,39 @@ def ask_ollama(prompt: str, lesson_context: str) -> str:
     )
     return result.stdout.decode().strip()
 
+def ask_ollama_anywhere(prompt: str, lesson_context: str) -> dict:
+    # This function is for any page and it can be to also move pages.
+    # Add navigation context to system prompt
+    nav_prompt = system_prompt + "\n\nYou can help users navigate lessons or answer questions. If they want to move to a different lesson, respond with the lesson ID. Available lessons: " + str([{"id": lesson["id"], "title": lesson["title"]} for lesson in lessons])
 
+    final_prompt = f"{nav_prompt}\n\nThis is the lesson context: {lesson_context}\n\nThis is the user prompt: {prompt}"
+
+    # Query Ollama
+    result = subprocess.run(
+        ["ollama", "run", "qwen2.5:7b"], 
+        input=final_prompt.encode(),
+        capture_output=True
+    )
+    response = result.stdout.decode().strip()
+
+    # Check if response indicates navigation
+    lower_response = response.lower()
+    if any(nav_word in lower_response for nav_word in ["go to", "move to", "navigate", "switch to"]):
+        # Extract lesson info from response
+        for lesson in lessons:
+            if lesson["title"].lower() in lower_response:
+                return {
+                    "response": response,
+                    "lesson_id": lesson["id"],
+                    "action": ShortcutAction.MOVE.value
+                }
+    
+    # Default to ASK action if no navigation detected
+    return {
+        "response": response,
+        "lesson_id": "",
+        "action": ShortcutAction.ASK.value
+    }
 
 
 # --- Natural TTS with gTTS ---
@@ -151,6 +199,31 @@ def voice_endpoint(request: VoiceRequest):
         return {"response": "No speech detected."}
 
     lesson_context = get_lesson_context(request.lesson_id, request.lesson_section_id)
-    response = ask_ollama(spoken_text, lesson_context) 
-    # speak(response)  # 👈 only /voice triggers TTS
+    response = ask_ollama(spoken_text, lesson_context)
+    # Start TTS in background thread so we can return immediately
+    threading.Thread(target=speak, args=(response,), daemon=True).start()
     return {"input": spoken_text, "response": response}
+
+@app.post("/shortcut")
+# Short cut end point is for voice input to either ask questions or to move to pages
+def shortcut_endpoint(request: ShortcutRequest):
+    """Handles voice input for navigation between lessons.
+    Only requires lesson_id to determine current context.
+    """
+    spoken_text = listen()
+    if not spoken_text:
+        return {"response": "No speech detected.", "lesson_id": "", "action": ShortcutAction.ASK.value}
+
+    print(spoken_text)
+
+    # Get lesson context if lesson_id is provided
+    lesson_context = None
+    if request.lesson_id and request.lesson_id in lesson_details:
+        # Get the first section as context for navigation
+        first_section = lesson_details[request.lesson_id]["sections"][0]
+        lesson_context = first_section["content"]
+    
+    response = ask_ollama_anywhere(spoken_text, lesson_context)
+    
+    print(response)
+    return response

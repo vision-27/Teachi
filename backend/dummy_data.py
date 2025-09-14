@@ -1,3 +1,4 @@
+
 # Mock lessons data
 lessons = [
     {
@@ -6,14 +7,9 @@ lessons = [
         "summary": "How water moves through Earth's systems."
     },
     {
-        "id": "photosynthesis",
-        "title": "Photosynthesis",
-        "summary": "How plants convert sunlight into energy."
-    },
-    {
-        "id": "ecosystem",
-        "title": "Ecosystem Dynamics",
-        "summary": "The complex interactions between living organisms and their environment."
+        "id": "Friction",
+        "title": "Friction",
+        "summary": "A force that opposes motion when two surfaces, fluids, or materials slide or roll against each other."
     }
 ]
 
@@ -54,6 +50,44 @@ lesson_details = {
                 "id": "importance",
                 "title": "Importance of the Water Cycle",
                 "content": "The water cycle is fundamental to life on Earth and plays a vital role in maintaining our planet's ecosystems. It ensures the continuous replenishment of freshwater resources, which are essential for drinking, agriculture, and industrial use. The water cycle also supports diverse ecosystems by providing water to plants and animals, influences weather patterns and climate systems, and helps regulate Earth's temperature. Understanding and protecting the water cycle is crucial for sustainable water management and addressing climate change challenges."
+            }
+        ]
+    },
+    "Friction": {
+        "id": "Friction",
+        "title": "Friction",
+        "sections": [
+            {
+                "id": "intro",
+                "title": "Introduction",
+                "content": "Friction is a force that resists the relative motion or tendency of motion between two surfaces in contact. It acts in the opposite direction to movement and plays an important role in our daily lives. Without friction, walking, driving, or even holding objects would be impossible, as surfaces would endlessly slide past each other."
+            },
+            {
+                "id": "types",
+                "title": "Types of Friction",
+                "content": [
+                    { 
+                        "step": "Static Friction", 
+                        "description": "The frictional force that prevents an object from moving when a small force is applied. It keeps objects at rest until the applied force overcomes this resistance." 
+                    },
+                    { 
+                        "step": "Kinetic (Sliding) Friction", 
+                        "description": "The resistive force that acts on an object when it is already sliding across a surface." 
+                    },
+                    { 
+                        "step": "Rolling Friction", 
+                        "description": "The resistance an object faces when it rolls over a surface. Rolling friction is usually weaker than sliding friction (e.g., wheels and ball bearings)." 
+                    },
+                    { 
+                        "step": "Fluid Friction", 
+                        "description": "The resistance caused when an object moves through a fluid (liquid or gas), such as air resistance experienced by a moving car or airplane." 
+                    }
+                ]
+            },
+            {
+                "id": "importance",
+                "title": "Importance of Friction",
+                "content": "Friction is essential for everyday life. It allows us to walk and drive by providing grip between our feet, tires, and the ground. Machines use friction for braking and controlling motion, while sports often depend on managing friction for performance. However, friction also produces wear and tear and wastes energy as heat, so reducing unnecessary friction is vital in technology, engineering, and design."
             }
         ]
     }
