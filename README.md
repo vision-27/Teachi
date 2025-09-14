@@ -19,6 +19,7 @@ An offline AI learning hub for rural schools, easing teacher workloads and givin
 
 - Node.js (version 16 or higher)
 - npm or yarn
+- ollama (qwen 2.5 7b)
 
 ### Installation
 
