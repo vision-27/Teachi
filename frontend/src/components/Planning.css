@@ -11,24 +11,35 @@
   border-right: 1px solid #e9ecef;
   padding: 2rem;
   overflow-y: auto;
+  height: 100vh;
+  position: sticky;
+  top: 0;
 }
 
 .planning-content {
   flex: 1;
   display: flex;
-  gap: 1.5rem;
+  gap: 2rem;
   padding: 2rem;
-  overflow-y: auto;
+  height: calc(100vh - 80px); /* Fixed height to enable proper scrolling */
+  overflow: hidden; /* Prevent outer container from scrolling */
 }
 
 .planning-main-content {
   flex: 1;
-  max-width: 800px;
+  max-width: 900px;
+  overflow-y: auto;
+  padding-right: 1rem; /* Add padding for scrollbar */
 }
 
 .planning-chatbot-column {
-  width: 350px;
+  width: 450px;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: fit-content;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
 }
 
 /* Planning Header */
@@ -144,13 +155,13 @@
 .lesson-sections {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 2.5rem;
 }
 
 .lesson-section {
   background: #ffffff;
   border-radius: 12px;
-  padding: 2rem;
+  padding: 2.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -444,6 +455,33 @@
   margin: 0;
 }
 
+/* Custom Scrollbar */
+.planning-main-content::-webkit-scrollbar,
+.planning-sidebar::-webkit-scrollbar,
+.planning-chatbot-column::-webkit-scrollbar {
+  width: 6px;
+}
+
+.planning-main-content::-webkit-scrollbar-track,
+.planning-sidebar::-webkit-scrollbar-track,
+.planning-chatbot-column::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.planning-main-content::-webkit-scrollbar-thumb,
+.planning-sidebar::-webkit-scrollbar-thumb,
+.planning-chatbot-column::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.planning-main-content::-webkit-scrollbar-thumb:hover,
+.planning-sidebar::-webkit-scrollbar-thumb:hover,
+.planning-chatbot-column::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .planning-layout {
@@ -453,21 +491,30 @@
   .planning-sidebar {
     width: 100%;
     padding: 1rem;
+    height: auto;
+    position: static;
   }
   
   .planning-content {
     flex-direction: column;
     padding: 1rem;
     gap: 1rem;
+    height: auto;
+    overflow: visible;
   }
   
   .planning-main-content {
     max-width: none;
+    overflow-y: visible;
+    padding-right: 0;
   }
   
   .planning-chatbot-column {
     width: 100%;
     order: -1; /* Show chatbot above content on mobile */
+    position: static;
+    height: auto;
+    max-height: none;
   }
   
   .lessons-grid {
