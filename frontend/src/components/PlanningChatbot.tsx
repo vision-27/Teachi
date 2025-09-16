@@ -112,8 +112,7 @@ const PlanningChatbot: React.FC<PlanningChatbotProps> = ({
     <div className="planning-chatbot">
       <div className="chatbot-header">
         <div className="chatbot-title">
-          <span className="chatbot-icon">🤖</span>
-          <span>AI Assistant</span>
+          <span>Sidekick</span>
         </div>
         <div className="chatbot-actions">
           <button 
