@@ -42,11 +42,13 @@ class AskRequest(BaseModel):
     lesson_section_id: str
     lessons_step: str
     userPrompt: str
+    language: str
 
 class VoiceRequest(BaseModel):
     lesson_id: str
     lesson_section_id: str
     lessons_step: str
+    language: str
 
 class ShortcutRequest(BaseModel):
     lesson_id: str
@@ -90,8 +92,15 @@ def get_lesson_context(lesson_id: str, lesson_section_id: str) -> Optional[str]:
     return None
 
 # -------------------- LLM calls --------------------
-def ask_ollama(prompt: str, lesson_context: Optional[str]) -> str:
-    final_prompt = f"{system_prompt}\n\nThis is the lesson context: {lesson_context}\n\nThis is the user prompt: {prompt}"
+def ask_ollama(prompt: str, lesson_context: Optional[str], language: str) -> str:
+    final_prompt = f"""
+    {system_prompt}
+    
+    This is the lesson context: {lesson_context}
+    
+    This is the user prompt: {prompt}
+    respond only in the language: {language}
+    """
     result = subprocess.run(
         ["ollama", "run", "qwen2.5:7b"],
         input=final_prompt.encode(),
@@ -99,31 +108,6 @@ def ask_ollama(prompt: str, lesson_context: Optional[str]) -> str:
     )
     return result.stdout.decode().strip()
 
-def ask_ollama_anywhere(prompt: str, lesson_context: Optional[str]) -> dict:
-    nav_prompt = system_prompt + "\n\nYou can help users navigate lessons or answer questions. If they want to move to a different lesson, respond with the lesson ID. Available lessons: " + str([{"id": lesson["id"], "title": lesson["title"]} for lesson in lessons])
-    final_prompt = f"{nav_prompt}\n\nThis is the lesson context: {lesson_context}\n\nThis is the user prompt: {prompt}"
-    result = subprocess.run(
-        ["ollama", "run", "qwen2.5:7b"],
-        input=final_prompt.encode(),
-        capture_output=True
-    )
-    response = result.stdout.decode().strip()
-
-    lower_response = response.lower()
-    if any(nav_word in lower_response for nav_word in ["go to", "move to", "navigate", "switch to"]):
-        for lesson in lessons:
-            if lesson["title"].lower() in lower_response:
-                return {
-                    "response": response,
-                    "lesson_id": lesson["id"],
-                    "action": ShortcutAction.MOVE.value
-                }
-
-    return {
-        "response": response,
-        "lesson_id": "",
-        "action": ShortcutAction.ASK.value
-    }
 
 # -------------------- TTS worker (robust) --------------------
 # Use a dedicated process to own pyttsx3 so it is never called from multiple threads.
@@ -228,6 +212,14 @@ def listen(timeout: float = 5.0, phrase_time_limit: float = 5.0) -> Optional[str
 
     return text_out if text_out else None
 
+def define_language(language: str) -> str:
+    if language == "en":
+        return "English"
+    elif language == "es":
+        return "Spanish"
+    else:
+        return "English"
+
 # -------------------- Endpoints --------------------
 @app.get("/api/lessons")
 async def get_lessons():
@@ -251,7 +243,8 @@ async def get_lesson_detail(lesson_id: str):
 @app.post("/text")
 def text_endpoint(request: AskRequest):
     lesson_context = get_lesson_context(request.lesson_id, request.lesson_section_id)
-    response = ask_ollama(request.userPrompt, lesson_context)
+    language = define_language(request.language)
+    response = ask_ollama(request.userPrompt, lesson_context, language)
     return {"input": request.userPrompt, "response": response}
 
 @app.post("/voice")
@@ -260,27 +253,13 @@ def voice_endpoint(request: VoiceRequest):
     if not spoken_text:
         return {"response": "No speech detected."}
 
+    language = define_language(request.language)
     lesson_context = get_lesson_context(request.lesson_id, request.lesson_section_id)
-    response = ask_ollama(spoken_text, lesson_context)
+    response = ask_ollama(spoken_text, lesson_context, language)
 
     # Tiny pause can help avoid device contention on some backends
     time.sleep(0.05)
     enqueue_tts(response)
     return {"input": spoken_text, "response": response}
 
-@app.post("/shortcut")
-def shortcut_endpoint(request: ShortcutRequest):
-    spoken_text = listen()
-    if not spoken_text:
-        return {"response": "No speech detected.", "lesson_id": "", "action": ShortcutAction.ASK.value}
 
-    # Fix: sections is a list; use first element safely
-    lesson_context = None
-    if request.lesson_id and request.lesson_id in lesson_details:
-        sections = lesson_details[request.lesson_id].get("sections", [])
-        if isinstance(sections, list) and sections:
-            first_section = sections
-            lesson_context = first_section.get("content")
-
-    response = ask_ollama_anywhere(spoken_text, lesson_context)
-    return response
