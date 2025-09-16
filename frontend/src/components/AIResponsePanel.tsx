@@ -13,12 +13,16 @@ interface AIResponsePanelProps {
   responses: AIResponse[]
   selectedConversationId: string | null
   isGenerating: boolean
+  selectedLanguage: string
+  onLanguageChange: (language: string) => void
 }
 
 const AIResponsePanel: React.FC<AIResponsePanelProps> = ({ 
   responses, 
   selectedConversationId,
-  isGenerating 
+  isGenerating,
+  selectedLanguage,
+  onLanguageChange
 }) => {
   const responsesEndRef = useRef<HTMLDivElement>(null)
 
@@ -42,9 +46,19 @@ const AIResponsePanel: React.FC<AIResponsePanelProps> = ({
           <span className="ai-panel-icon"></span>
           Sidekick
         </h3>
-        {selectedConversation && (
-          <span className="ai-panel-section">{selectedConversation.sectionTitle}</span>
-        )}
+        <div className="ai-panel-controls">
+          <select 
+            className="ai-language-selector"
+            value={selectedLanguage}
+            onChange={(e) => onLanguageChange(e.target.value)}
+          >
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+          </select>
+          {selectedConversation && (
+            <span className="ai-panel-section">{selectedConversation.sectionTitle}</span>
+          )}
+        </div>
       </div>
 
       <div className="ai-panel-content">

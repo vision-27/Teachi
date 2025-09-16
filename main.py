@@ -6,7 +6,7 @@ import os
 import asyncio
 from typing import List, Dict, Any, Optional
 from enum import Enum
-from dummy_data import lessons, lesson_details
+from backend.dummy_data import lessons, lesson_details
 import threading
 import json
 import time
@@ -178,7 +178,7 @@ def _stop_tts_worker():
         pass
 
 # -------------------- Vosk STT --------------------
-VOSK_MODEL_PATH = "F:/Teachi/vosk-model-small-en-us-0.15"  # adjust as needed
+VOSK_MODEL_PATH = "vosk-model-small-en-us-0.15"  # adjust as needed
 vosk_model = VoskModel(VOSK_MODEL_PATH)
 
 def listen(timeout: float = 5.0, phrase_time_limit: float = 5.0) -> Optional[str]:

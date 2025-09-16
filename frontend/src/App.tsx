@@ -4,6 +4,7 @@ import Header from './components/Header'
 import Landing from './components/Landing'
 import LessonsList from './components/LessonsList'
 import LessonContent from './components/LessonContent'
+import Planning from './components/Planning'
 import KeyHoldIndicator from './components/KeyHoldIndicator'
 import { ShortcutProvider } from './contexts/ShortcutContext'
 import { useGlobalShortcut } from './hooks/useGlobalShortcut'
@@ -24,6 +25,7 @@ const AppContent: React.FC = () => {
           <Route path="/" element={<Landing />} />
           <Route path="/lessons" element={<LessonsList />} />
           <Route path="/lesson/:lessonId" element={<LessonContent />} />
+          <Route path="/planning" element={<Planning />} />
         </Routes>
       </main>
       

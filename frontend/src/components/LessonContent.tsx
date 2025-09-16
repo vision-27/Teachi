@@ -23,6 +23,7 @@ const LessonContent: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false)
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null)
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0) // Used by Carousel onSlideChange
+  const [selectedLanguage, setSelectedLanguage] = useState('en')
 
   useEffect(() => {
     const fetchLessonData = async () => {
@@ -136,6 +137,7 @@ const LessonContent: React.FC = () => {
               sectionId={section.id}
               sectionTitle={section.title}
               slideNum={index + 1}
+              language={selectedLanguage}
             />
             <VoiceButton
               onSubmit={(input, response) => handleAIPromptSubmit(input, response, section.title)}
@@ -143,6 +145,7 @@ const LessonContent: React.FC = () => {
               sectionId={section.id}
               sectionTitle={section.title}
               slideNum={index + 1}
+              language={selectedLanguage}
             />
           </div>
         </div>
@@ -201,6 +204,8 @@ const LessonContent: React.FC = () => {
             responses={aiResponses}
             selectedConversationId={selectedConversationId}
             isGenerating={isGenerating}
+            selectedLanguage={selectedLanguage}
+            onLanguageChange={setSelectedLanguage}
           />
         </div>
       </div>
@@ -258,6 +263,8 @@ const LessonContent: React.FC = () => {
             responses={aiResponses}
             selectedConversationId={selectedConversationId}
             isGenerating={isGenerating}
+            selectedLanguage={selectedLanguage}
+            onLanguageChange={setSelectedLanguage}
           />
         </div>
       </div>
@@ -315,6 +322,8 @@ const LessonContent: React.FC = () => {
             responses={aiResponses}
             selectedConversationId={selectedConversationId}
             isGenerating={isGenerating}
+            selectedLanguage={selectedLanguage}
+            onLanguageChange={setSelectedLanguage}
           />
         </div>
       </div>
@@ -377,8 +386,10 @@ const LessonContent: React.FC = () => {
         <AIResponsePanel
           responses={aiResponses}
           selectedConversationId={selectedConversationId}
-          isGenerating={isGenerating}
-        />
+            isGenerating={isGenerating}
+            selectedLanguage={selectedLanguage}
+            onLanguageChange={setSelectedLanguage}
+          />
       </div>
     </div>
   )

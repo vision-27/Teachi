@@ -8,9 +8,10 @@ interface AIButtonProps {
   sectionId: string
   sectionTitle: string
   slideNum?: number
+  language: string
 }
 
-const AIButton: React.FC<AIButtonProps> = ({ onSubmit, lessonId, sectionId, slideNum }) => {
+const AIButton: React.FC<AIButtonProps> = ({ onSubmit, lessonId, sectionId, slideNum, language }) => {
   const [isInputMode, setIsInputMode] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -37,7 +38,8 @@ const AIButton: React.FC<AIButtonProps> = ({ onSubmit, lessonId, sectionId, slid
           lesson_id: lessonId,
           lesson_section_id: sectionId,
           lessons_step: slideNum ? slideNum.toString() : '1',
-          userPrompt: inputValue.trim()
+          userPrompt: inputValue.trim(),
+          language: language
         }
         
         const response = await api.askAI(request)

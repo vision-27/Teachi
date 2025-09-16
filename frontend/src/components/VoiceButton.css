@@ -40,7 +40,6 @@
 
 .voice-button.processing {
   background: linear-gradient(135deg, #f59e0b, #d97706);
-  animation: spin 1s linear infinite;
 }
 
 .voice-icon {
@@ -66,14 +65,6 @@
   }
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
 
 /* Responsive design */
 @media (max-width: 768px) {

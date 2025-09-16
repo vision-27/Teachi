@@ -41,11 +41,47 @@
   color: #374151;
   font-weight: 500;
   font-size: 1.1rem;
-  transition: color 0.2s;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  position: relative; 
+  overflow: hidden;
 }
 
 .nav-link:hover {
   color: #2563eb;
+  background-color: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.nav-link.active {
+  color: #1e40af;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(30, 64, 175, 0.15);
+  transform: translateY(-1px);
+}
+
+.nav-link.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.1), rgba(59, 130, 246, 0.1));
+  border-radius: 0.5rem;
+  z-index: -1;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 2px 8px rgba(30, 64, 175, 0.15);
+  }
+  to {
+    box-shadow: 0 4px 16px rgba(30, 64, 175, 0.25);
+  }
 }
 
 .header-right {

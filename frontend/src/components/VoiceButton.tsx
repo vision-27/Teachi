@@ -8,13 +8,15 @@ interface VoiceButtonProps {
   sectionId: string
   sectionTitle: string
   slideNum?: number
+  language: string
 }
 
 const VoiceButton: React.FC<VoiceButtonProps> = ({ 
   onSubmit, 
   lessonId, 
   sectionId, 
-  slideNum 
+  slideNum,
+  language
 }) => {
   const [isListening, setIsListening] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -29,7 +31,8 @@ const VoiceButton: React.FC<VoiceButtonProps> = ({
       const request: VoiceRequest = {
         lesson_id: lessonId,
         lesson_section_id: sectionId,
-        lessons_step: slideNum ? slideNum.toString() : '1'
+        lessons_step: slideNum ? slideNum.toString() : '1',
+        language: language
       }
 
       const response = await api.askVoice(request)

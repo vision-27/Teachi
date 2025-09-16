@@ -26,6 +26,7 @@ export interface AskRequest {
   lesson_section_id: string
   lessons_step: string
   userPrompt: string
+  language: string
 }
 
 export interface AskResponse {
@@ -37,6 +38,7 @@ export interface VoiceRequest {
   lesson_id: string
   lesson_section_id: string
   lessons_step: string
+  language: string
 }
 
 export interface VoiceResponse {
@@ -62,6 +64,7 @@ export interface ShortcutRequest {
   lesson_id: string
   lesson_section_id: string
   lessons_step: string
+  language: string
 }
 
 const API_BASE_URL = 'http://localhost:3001'

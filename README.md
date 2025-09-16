@@ -19,7 +19,9 @@ An offline AI learning hub for rural schools, easing teacher workloads and givin
 
 - Node.js (version 16 or higher)
 - npm or yarn
+- Python 3.8+ (for backend)
 - ollama (qwen 2.5 7b)
+- Vosk speech recognition model (for offline voice commands)
 
 ### Installation
 
@@ -35,7 +37,37 @@ npm run dev
 
 3. Open your browser and navigate to `http://localhost:3000` (Vite default port)
 
-**Note**: This frontend requires a Python backend running on `http://localhost:3001/`. See `API_SETUP.md` for backend setup instructions.
+**Note**: This frontend requires a Python backend running on `http://localhost:8000/`. See the Backend Setup section below for instructions.
+
+## Backend Setup
+
+### 1. Install Python Dependencies
+```bash
+cd backend
+pip install -r requirements.txt
+```
+
+### 2. Download Vosk Model (Required for Voice Commands)
+```bash
+# Automatic download
+python download_vosk_model.py
+
+# Or manual download
+wget https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip
+unzip vosk-model-small-en-us-0.15.zip
+rm vosk-model-small-en-us-0.15.zip
+```
+
+### 3. Start the Backend Server
+```bash
+# Option 1: Direct Python
+python main.py
+
+# Option 2: With uvicorn
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Important**: The Vosk model files are large (~40MB) and are excluded from git. You must download them manually using the instructions above.
 
 ### Available Scripts
 

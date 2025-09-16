@@ -291,3 +291,7 @@ speech.mp3
 
 # FastAPI specific
 .pytest_cache/
+
+# Vosk speech recognition models (too large for git)
+vosk-model*/
+vosk-model-*.zip
